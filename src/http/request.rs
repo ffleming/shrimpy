@@ -14,11 +14,11 @@ impl HttpRequest {
         let error = Err(From::from("Could not parse request"));
         let mut iter = request.split("\x0D").map(|l| l.trim() );
 
-        let first_line = match iter.next() {
+        let request_line = match iter.next() {
             Some(slice) => slice,
             None        => return error
         };
-        let words: Vec<&str> = first_line.split(" ").collect();
+        let words: Vec<&str> = request_line.split(" ").collect();
         if words.len() != 3 {
             return error;
         }
