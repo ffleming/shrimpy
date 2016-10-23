@@ -18,13 +18,13 @@ impl HttpRequest {
             Some(slice) => slice,
             None        => return error
         };
-        let words: Vec<&str> = request_line.split(" ").collect();
-        if words.len() != 3 {
+        let request_parts: Vec<&str> = request_line.split(" ").collect();
+        if request_parts.len() != 3 {
             return error;
         }
-        let verb = words[0];
-        let path = words[1];
-        let http_version = words[2];
+        let verb = request_parts[0];
+        let path = request_parts[1];
+        let http_version = request_parts[2];
         let mut path_iterator = path.splitn(2, "?");
         let path = match path_iterator.next() {
             Some(p) => p,
