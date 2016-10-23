@@ -12,7 +12,7 @@ pub struct HttpRequest {
 impl HttpRequest {
     pub fn new(request: String) -> Result<HttpRequest, Box<Error>> {
         let error = Err(From::from("Could not parse request"));
-        let mut iter = request.split("\x0D\x0A").map(|l| l.trim() );
+        let mut iter = request.split("\x0D").map(|l| l.trim() );
 
         let first_line = match iter.next() {
             Some(slice) => slice,
