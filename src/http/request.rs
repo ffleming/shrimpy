@@ -1,32 +1,47 @@
+use std::error::Error;
+
 #[derive(Debug)]
 pub struct HttpRequest {
     verb: String,
     path: String,
     parameters: String,
     http_version: String,
-    hostname: String,
     headers: Vec<String>,
     body: String,
 }
 impl HttpRequest {
-    pub fn new(request: String) -> HttpRequest {
+    pub fn new(request: String) -> Result<HttpRequest, Box<Error>> {
+        let error = Err(From::from("Could not parse request"));
         let mut iter = request.split("\x0D\x0A").map(|l| l.trim() );
-        let first_line = iter.next().unwrap();
-        let verb = first_line.splitn(2, " ").next().unwrap();
-        let mut iter = first_line.rsplitn(2, " ");
-        let http_version = iter.next().unwrap().splitn(2, "HTTP/").last().unwrap();
-        let mut path_i = iter.next().unwrap().splitn(2, "?");
-        let path = path_i.next().unwrap();
-        let parameters = path_i.next().unwrap();
-        return HttpRequest {
+
+        let first_line = match iter.next() {
+            Some(slice) => slice,
+            None        => return error
+        };
+        let words: Vec<&str> = first_line.split(" ").collect();
+        if words.len() != 3 {
+            return error;
+        }
+        let verb = words[0];
+        let path = words[1];
+        let http_version = words[2];
+        let mut path_iterator = path.splitn(2, "?");
+        let path = match path_iterator.next() {
+            Some(p) => p,
+            None        => return error
+        };
+        let parameters = match path_iterator.next() {
+            Some(params) => params,
+            None    => ""
+        };
+        return Ok(HttpRequest {
             verb: String::from(verb),
             path: String::from(path),
             parameters: String::from(parameters),
             http_version: String::from(http_version),
-            hostname: String::from("hostname"),
             headers: vec!(String::from("header1"), String::from("header2")),
             body: String::from("body"),
-        };
+        });
     }
 }
 
