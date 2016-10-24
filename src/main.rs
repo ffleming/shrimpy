@@ -1,10 +1,15 @@
 pub mod http;
 use std::net::{TcpListener, TcpStream};
-use std::io::{Write, BufRead, BufReader};
+use std::io::{Write, Read, BufRead, BufReader};
+use std::error::Error;
+use std::fs::File;
+use std::path::Path;
 use std::thread;
 use http::request::HttpRequest as HttpRequest;
+use http::response::HttpResponse as HttpResponse;
 
-fn read_stream(mut stream: &mut TcpStream) {
+//TODO: move this logic into request, have new take a TcpStream
+fn read_stream(mut stream: &mut TcpStream) -> Result<HttpRequest, Box<Error>> {
     let remote_ip = stream.peer_addr().unwrap().ip();
     let mut reader = BufReader::new(&mut stream);
     let mut request = String::new();
@@ -18,11 +23,17 @@ fn read_stream(mut stream: &mut TcpStream) {
     println!("Connection from {}:", remote_ip);
     println!("{}", request);
     let req = HttpRequest::new(request);
-    println!("{:?}", req);
+    return req;
 }
 
-fn write_stream(stream: &mut TcpStream) {
-    let html = include_str!("index.html");
+fn write_stream(stream: &mut TcpStream, filename: &str) {
+    let path = Path::new(filename);
+    let mut file = match File::open(&path) {
+        Err(why) => File::open(&"404.html").expect("couldn't find 404.html"),
+        Ok(file) => file,
+    };
+    let mut html = String::new();
+    let _ = file.read_to_string(&mut html);
     let _ = stream.write("HTTP/1.0 200 OK\r\n\r\n".as_bytes());
     let _ = stream.write(html.as_bytes());
     let _ = stream.flush();
@@ -30,8 +41,9 @@ fn write_stream(stream: &mut TcpStream) {
 }
 
 fn process_stream(mut stream: TcpStream) {
-    read_stream(&mut stream);
-    write_stream(&mut stream);
+    let request = read_stream(&mut stream).expect("It broke");
+    let filename = format!("{}{}", "./", request.path);
+    write_stream(&mut stream, &filename);
     return;
 }
 

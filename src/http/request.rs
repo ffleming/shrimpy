@@ -3,11 +3,11 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct HttpRequest {
-    verb: String,
-    path: String,
-    parameters: HashMap<String, String>,
-    http_version: String,
-    headers: HashMap<String, String>,
+    pub verb: String,
+    pub path: String,
+    pub parameters: HashMap<String, String>,
+    pub http_version: String,
+    pub headers: HashMap<String, String>,
 }
 
 impl HttpRequest {
