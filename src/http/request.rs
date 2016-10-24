@@ -33,10 +33,7 @@ impl HttpRequest {
             Some(p) => p,
             None        => return error
         };
-        let param_string = match path_iterator.next() {
-            Some(params) => params,
-            None    => ""
-        };
+        let param_string = path_iterator.next().unwrap_or("");
         let parameters = build_parameters(param_string);
 
         return Ok(HttpRequest {
@@ -55,11 +52,12 @@ fn str_to_hash(input: &str, item_separator: &str, key_value_separator: &str)
         map(|kv| kv.splitn(2, key_value_separator).collect::<Vec<&str>>()).
         map(|vec| {
             let k = vec[0].trim().to_string();
-            let v = if vec.len() == 2 {
-                vec[1].trim().to_string()
-            } else {
-                "".to_string()
-            };
+            let v =
+                if vec.len() == 2 {
+                    vec[1].trim().to_string()
+                } else {
+                    "".to_string()
+                };
             (k, v)
         }).collect();
     return hash;
