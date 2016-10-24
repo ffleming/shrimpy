@@ -3,10 +3,10 @@ use std::net::{TcpListener, TcpStream};
 use std::io::{Write, Read, BufRead, BufReader};
 use std::error::Error;
 use std::fs::File;
-use std::path::Path;
+use std::path::{PathBuf};
 use std::thread;
 use http::request::HttpRequest as HttpRequest;
-use http::response::HttpResponse as HttpResponse;
+// use http::response::HttpResponse as HttpResponse;
 
 //TODO: move this logic into request, have new take a TcpStream
 fn read_stream(mut stream: &mut TcpStream) -> Result<HttpRequest, Box<Error>> {
@@ -27,22 +27,26 @@ fn read_stream(mut stream: &mut TcpStream) -> Result<HttpRequest, Box<Error>> {
 }
 
 fn write_stream(stream: &mut TcpStream, filename: &str) {
-    let path = Path::new(filename);
-    let mut file = match File::open(&path) {
-        Err(why) => File::open(&"404.html").expect("couldn't find 404.html"),
+    let mut path = PathBuf::from(filename);
+    if path.is_dir() {
+        path = path.join("index.html");
+    }
+
+    let mut file = match File::open(path.as_path()) {
+        Err(_) => File::open(&"src/404.html").expect("couldn't find 404.html"),
         Ok(file) => file,
     };
-    let mut html = String::new();
-    let _ = file.read_to_string(&mut html);
+    let mut html: Vec<u8> = std::vec::Vec::new();
+    let _ = file.read_to_end(&mut html).expect("Error reading file");
     let _ = stream.write("HTTP/1.0 200 OK\r\n\r\n".as_bytes());
-    let _ = stream.write(html.as_bytes());
+    let _ = stream.write(html.as_slice());
     let _ = stream.flush();
     return;
 }
 
 fn process_stream(mut stream: TcpStream) {
     let request = read_stream(&mut stream).expect("It broke");
-    let filename = format!("{}{}", "./", request.path);
+    let filename = format!("{}{}", "./src/", request.path);
     write_stream(&mut stream, &filename);
     return;
 }

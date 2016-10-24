@@ -16,3 +16,12 @@ especially sassy, POST.
 Shrimpy does not use any crates, with the possible exception of libc so I can
 use `fork()`.  If I'm being realistic, though, Shrimpy probably won't make it
 that far.
+
+TODO
+---
+1. Maybe don't allow path traversal (fun fact: I couldn't trivially trigger
+   this, but it has to be there.  It just has to.)
+2. Struct for server
+3. Configurable root directory, serve files from it
+4. Logging that isn't `println!()`
+5. Daemonization
