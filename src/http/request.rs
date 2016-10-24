@@ -10,30 +10,6 @@ pub struct HttpRequest {
     headers: HashMap<String, String>,
 }
 
-fn str_to_hash(input: &str, item_separator: &str, key_value_separator: &str)
-    -> HashMap<String, String> {
-    let hash: HashMap<String, String> = input.trim().split(item_separator).
-        map(|kv| kv.splitn(2, key_value_separator).collect::<Vec<&str>>()).
-        map(|vec| {
-            let k = vec[0].trim().to_string();
-            let v = if vec.len() == 2 {
-                vec[1].trim().to_string()
-            } else {
-                "".to_string()
-            };
-            (k, v)
-        }).collect();
-    return hash;
-}
-
-fn build_headers(header_str: &str) -> HashMap<String, String> {
-    return str_to_hash(header_str, "\n", ":");
-}
-
-fn build_parameters(param_str: &str) -> HashMap<String, String> {
-    return str_to_hash(param_str, "&", "=");
-}
-
 impl HttpRequest {
     pub fn new(request: String) -> Result<HttpRequest, Box<Error>> {
         let error = Err(From::from("Could not parse request"));
@@ -71,5 +47,29 @@ impl HttpRequest {
             headers: headers,
         });
     }
+}
+
+fn str_to_hash(input: &str, item_separator: &str, key_value_separator: &str)
+    -> HashMap<String, String> {
+    let hash: HashMap<String, String> = input.trim().split(item_separator).
+        map(|kv| kv.splitn(2, key_value_separator).collect::<Vec<&str>>()).
+        map(|vec| {
+            let k = vec[0].trim().to_string();
+            let v = if vec.len() == 2 {
+                vec[1].trim().to_string()
+            } else {
+                "".to_string()
+            };
+            (k, v)
+        }).collect();
+    return hash;
+}
+
+fn build_headers(header_str: &str) -> HashMap<String, String> {
+    return str_to_hash(header_str, "\n", ":");
+}
+
+fn build_parameters(param_str: &str) -> HashMap<String, String> {
+    return str_to_hash(param_str, "&", "=");
 }
 
