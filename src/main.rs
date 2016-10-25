@@ -1,4 +1,6 @@
 pub mod http;
+pub mod os_ffi;
+use std::process::exit;
 use http::server::HttpServer as HttpServer;
 
 fn main() {
@@ -7,5 +9,18 @@ fn main() {
         host: String::from("127.0.0.1"),
         root: String::from("src/")
     };
-    server.run();
+    unsafe {
+        let pid = os_ffi::fork();
+        println!("woof woof {}", pid);
+        match pid {
+            -1 => panic!("Fork failed!"),
+            0  => server.run(),
+            _  =>
+                {
+                    println!("Daemonizing with pid {}", pid);
+                    exit(0);
+                }
+        }
+        server.run();
+    }
 }

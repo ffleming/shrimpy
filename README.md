@@ -24,4 +24,4 @@ TODO
 2. Struct for server
 3. Configurable root directory, serve files from it
 4. Logging that isn't `println!()`
-5. Daemonization
+5. Privilege dropping in child
