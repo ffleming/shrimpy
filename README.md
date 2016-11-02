@@ -18,4 +18,6 @@ TODO
 5. ~~Daemonization~~
 6. Privilege dropping in child
 7. ~~Argument parsing / help text~~
-8. Module & struct for argument parser
+8. ~~Module & struct for argument parser~~
+9. Help text generation for argument parser
+10. Allow argument parser to specify required arguments
