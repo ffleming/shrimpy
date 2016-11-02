@@ -3,7 +3,6 @@ pub mod os_ffi;
 pub mod argument_parser;
 use std::process::exit;
 use std::env::args;
-use std::collections::HashMap;
 use http::server::HttpServer as HttpServer;
 use argument_parser::Argument as Argument;
 use argument_parser::ArgumentHash as AHash;
