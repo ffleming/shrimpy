@@ -25,9 +25,10 @@ impl HttpServer {
             match stream {
                 Ok(stream) => {
                     let server = self.clone();
-                    let _ = thread::spawn(move|| {
+                    let handle = thread::spawn(move|| {
                         server.process_stream(stream);
                     });
+                    handle.join().unwrap();
                 }
                 Err(e) => {
                     println!("error {:?}\n", e);
@@ -58,7 +59,7 @@ impl HttpServer {
             let _ = reader.read_line(&mut request);
         }
         println!("Connection from {}:", remote_ip);
-        println!("{}", request);
+        // println!("{}", request);
         let req = HttpRequest::new(request);
         return req;
     }
