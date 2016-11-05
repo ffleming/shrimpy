@@ -81,5 +81,6 @@ fn print_help() {
     println!("Run shrimpy http server");
     println!("");
     println!("  -d, --daemonize\t\t Run server in background");
+    println!("  -r, --root\t\t\t Root path from which to serve files");
     println!("  -h, --help\t\t\t This help");
 }
