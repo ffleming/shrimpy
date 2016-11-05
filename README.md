@@ -13,7 +13,7 @@ TODO
 ---
 1. Maybe don't allow path traversal (fun fact: I couldn't trivially trigger this, but it has to be there.  It just has to.)
 2. ~~Module & struct for server~~
-3. Configurable root directory, serve files from it
+3. ~~Configurable root directory, serve files from it~~
 4. Logging that isn't `println!()`
 5. ~~Daemonization~~
 6. Privilege dropping in child
@@ -21,3 +21,4 @@ TODO
 8. ~~Module & struct for argument parser~~
 9. Help text generation for argument parser
 10. Allow argument parser to specify required arguments
+11. Allow argument parser to specify default values for arguments
