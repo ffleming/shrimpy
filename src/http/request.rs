@@ -36,19 +36,19 @@ impl HttpRequest {
         let param_string = path_iterator.next().unwrap_or("");
         let parameters = build_parameters(param_string);
 
-        return Ok(HttpRequest {
+        Ok(HttpRequest {
             verb: String::from(verb),
             path: String::from(path),
             http_version: String::from(http_version),
             parameters: parameters,
             headers: headers,
-        });
+        })
     }
 }
 
 fn str_to_hash(input: &str, item_separator: &str, key_value_separator: &str)
     -> HashMap<String, String> {
-    let hash: HashMap<String, String> = input.trim().split(item_separator).
+    input.trim().split(item_separator).
         map(|kv| kv.splitn(2, key_value_separator).collect::<Vec<&str>>()).
         map(|vec| {
             let k = vec[0].trim().to_string();
@@ -59,15 +59,14 @@ fn str_to_hash(input: &str, item_separator: &str, key_value_separator: &str)
                     "".to_string()
                 };
             (k, v)
-        }).collect();
-    return hash;
+        }).collect()
 }
 
 fn build_headers(header_str: &str) -> HashMap<String, String> {
-    return str_to_hash(header_str, "\n", ":");
+    str_to_hash(header_str, "\n", ":")
 }
 
 fn build_parameters(param_str: &str) -> HashMap<String, String> {
-    return str_to_hash(param_str, "&", "=");
+    str_to_hash(param_str, "&", "=")
 }
 
