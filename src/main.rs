@@ -55,7 +55,7 @@ fn main() {
         root: (*root).clone()
     };
 
-    run_server(server, daemonize == "true");
+    run_server(server, daemonize == "true")
 }
 
 fn run_server(server: HttpServer, daemonize: bool) {
