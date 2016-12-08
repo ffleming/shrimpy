@@ -2,7 +2,6 @@ pub mod http;
 pub mod os_ffi;
 pub mod argument_parser;
 use std::process::exit;
-use std::env::args;
 use http::server::HttpServer as HttpServer;
 use argument_parser::Argument as Argument;
 use argument_parser::ArgumentHash as AHash;
@@ -83,9 +82,10 @@ fn daemonize_server(server: HttpServer) {
 }
 
 fn print_help() {
-    let prog_full_path: String = args().next().unwrap();
-    let prog_name = prog_full_path.split("/").last().unwrap();
-    println!("Usage {} [OPTION]", prog_name);
+    let exe_path = std::env::current_exe().unwrap();
+    let exe = exe_path.file_name().unwrap().to_string_lossy();
+
+    println!("Usage: {} [OPTION]", exe);
     println!("Run shrimpy http server");
     println!("");
     println!("  -d, --daemonize\t\t Run server in background");
