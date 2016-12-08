@@ -1,6 +1,5 @@
 use std::error::Error;
 use std::collections::HashMap;
-use http::request::HttpRequest as HttpRequest;
 
 #[derive(Debug)]
 pub struct HttpResponse {
@@ -12,15 +11,14 @@ pub struct HttpResponse {
 }
 
 impl HttpResponse {
-    pub fn new(request: HttpRequest, body_string: String) -> Result<HttpResponse, Box<Error>> {
+    pub fn new(http_version: &String, body_string: &String) -> Result<HttpResponse, Box<Error>> {
         let code = String::from("200");
-        let http_version = request.http_version;
         return Ok(HttpResponse {
             code: code,
             code_mnemonic: String::from("OK"),
-            http_version: http_version,
+            http_version: http_version.clone(),
             headers: HashMap::new(),
-            body: body_string
+            body: body_string.clone()
         });
     }
     pub fn as_string(&self) -> String {

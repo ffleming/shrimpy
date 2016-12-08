@@ -2,10 +2,10 @@ use std::thread;
 use std::net::{TcpListener, TcpStream};
 use std::fs::File;
 use std::error::Error;
-use std::path::{PathBuf};
+use std::path::{PathBuf, MAIN_SEPARATOR};
 use std::io::{Write, Read, BufRead, BufReader};
 use http::request::HttpRequest as HttpRequest;
-// use http::response::HttpResponse as HttpResponse;
+use http::response::HttpResponse as HttpResponse;
 
 #[derive(Debug)]
 #[derive(Clone)]
@@ -39,10 +39,13 @@ impl HttpServer {
     }
 
     pub fn process_stream(&self, mut stream: TcpStream) {
-        let request = self.read_stream(&mut stream).expect("It broke");
-        let filename = format!("{}/{}", self.root, request.path);
-        println!("Serving {}", filename);
-        self.write_stream(&mut stream, &filename);
+        let request = self.read_stream(&mut stream).expect("Request broke");
+        let filename = self.requested_absolute_path(&request);
+        let body_string = self.read_file(filename);
+        let response = HttpResponse::new( &request.http_version,
+                                          &body_string
+                                        ).expect("Response broke");
+        self.write_response(&mut stream, &response);
         return;
     }
 
@@ -59,35 +62,45 @@ impl HttpServer {
             let _ = reader.read_line(&mut request);
         }
         println!("Connection from {}:", remote_ip);
-        // println!("{}", request);
         let req = HttpRequest::new(request);
         return req;
     }
 
-    fn write_stream(&self, stream: &mut TcpStream, filename: &str) {
-        let mut path = PathBuf::from(filename);
-        if path.is_dir() {
-            path = path.join("index.html");
+    fn read_file(&self, filename: PathBuf) -> String {
+        let mut result = String::new();
+        println!("Serving {:?}", filename);
+        match File::open(&filename) {
+            Err(_) => { result = self.error_404(&filename) },
+            Ok(mut file) => { file.read_to_string(&mut result).expect("Died in read_file"); },
         }
+        result
+    }
 
-        let file_404 = format!("{}/{}", self.root, "404.html");
-
-        let mut file = match File::open(path.as_path()) {
-            Err(_) => match File::open(&file_404) {
-                Ok(not_found) => not_found,
-                Err(err) => {
-                    println!("ERROR: Couldn't find 404.html");
-                    println!("{:?}", err);
-                    return;
-                }
-            },
-            Ok(file) => file,
+    fn requested_absolute_path(&self, request: &HttpRequest) -> PathBuf {
+        // treat requested path as absolute to limit directory traversal,
+        // then remove extraneous path separator
+        let single = &(MAIN_SEPARATOR.to_string());
+        let double = &(format!("{}{}", single, single));
+        let filename = format!("{}{}", self.root, request.path).replace(double, single);
+        let mut pathbuf = PathBuf::from(filename);
+        if pathbuf.is_dir() {
+            pathbuf = pathbuf.join("index.html");
         };
-        let mut html: Vec<u8> = Vec::new();
-        let _ = file.read_to_end(&mut html).expect("Error reading file");
+        pathbuf
+    }
+
+    fn write_response(&self, stream: &mut TcpStream, response: &HttpResponse) {
         let _ = stream.write("HTTP/1.0 200 OK\r\n\r\n".as_bytes());
-        let _ = stream.write(html.as_slice());
+        let _ = stream.write(response.body.as_bytes());
         let _ = stream.flush();
-        return;
+    }
+
+    fn error_404(&self, filename: &PathBuf) -> String {
+        format!(
+            "
+            <html>
+            <head><title>Shrimpy - Not found</title></head>
+            <body><h1>404 - Not Found</h1>The file {:?} could not be found</body>
+            ", filename)
     }
 }
