@@ -22,9 +22,6 @@ impl HttpResponse {
         });
     }
     pub fn as_string(&self) -> String {
-        let response_line = format!("{} {} {}\r\n",
-                                    self.http_version, self.code, self.code_mnemonic);
-
-        return response_line;
+        format!("{} {} {}\r\n", self.http_version, self.code, self.code_mnemonic)
     }
 }

@@ -46,7 +46,6 @@ impl HttpServer {
                                           &body_string
                                         ).expect("Response broke");
         self.write_response(&mut stream, &response);
-        return;
     }
 
     //CONSIDER: move this logic into request, have new take a TcpStream
@@ -62,8 +61,7 @@ impl HttpServer {
             let _ = reader.read_line(&mut request);
         }
         println!("Connection from {}:", remote_ip);
-        let req = HttpRequest::new(request);
-        return req;
+        HttpRequest::new(request)
     }
 
     fn read_file(&self, filename: PathBuf) -> String {

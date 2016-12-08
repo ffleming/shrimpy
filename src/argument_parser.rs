@@ -42,12 +42,11 @@ impl ArgumentHash {
             let larg = long_arg_cloned.long_argument.clone();
             self.long_arguments.insert(larg, long_arg_cloned);
         }
-        return self;
+        self
     }
 
     pub fn with_arg(&mut self, arg: Argument) -> &mut ArgumentHash {
-        self.with_argument(arg);
-        return self;
+        self.with_argument(arg)
     }
 
     fn check_long_arg<'a>(&'a self, word: &'a String) -> (&str, &str) {
@@ -59,7 +58,7 @@ impl ArgumentHash {
             get(provided_long_arg).
             expect("Don't know what to do with that option").
             key;
-        return (key, val);
+        (key, val)
     }
 
     fn check_short_arg<'a>(&'a self, word: &'a String, args_vec: &'a Vec<String>, i: usize) -> (&str, &str) {
@@ -83,7 +82,7 @@ impl ArgumentHash {
             val = "true";
         };
 
-        return (key, val)
+        (key, val)
     }
 
     pub fn as_hash(&self) -> HashMap<String, String> {
@@ -102,7 +101,7 @@ impl ArgumentHash {
             }
             arg_hash.insert(String::from(pair.0), String::from(pair.1));
         }
-        return arg_hash;
+        arg_hash
     }
 
 }
