@@ -60,9 +60,9 @@ fn main() {
 
 fn run_server(server: HttpServer, daemonize: bool) {
     if daemonize {
-        daemonize_server(server);
+        daemonize_server(server)
     } else {
-        server.run();
+        server.run()
     }
 }
 
